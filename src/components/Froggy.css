@@ -1,0 +1,128 @@
+/* Container layout */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f9fafb;
+  font-family: "Inter", sans-serif;
+}
+
+/* Sidebar (Left) */
+.sidebar {
+  width: 25%;
+  background-color: #ffffff;
+  border-right: 1px solid #d1d5db;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.app-name {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.toggle-theme {
+  background: transparent;
+  border: 1px solid #d3cdcd;
+  border-radius: 50%;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+/* Notes list area */
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 100%;
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-top: 0.5rem;
+}
+
+.note-card {
+  background-color: #f3f4f6;
+  border-radius: 10px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.note-card:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-2px);
+}
+
+/* Middle Panel */
+.main-content {
+  flex: 1;
+  background-color: #fff;
+  border-right: 1px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.placeholder-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.subtext {
+    font-size: 0.95rem;
+    color: #6b7280;
+}
+
+/* Right Panel */
+.extra-panel {
+    width: 25%;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 25%;
+    }
+
+    .extra-panel {
+        display: none; /* hide the right panel on smaller screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: 25%;
+        border-right: none;
+        border-bottom: 1px solid #d1d5db;
+    }
+
+    .main-content {
+        height: 75%;
+    }
+}

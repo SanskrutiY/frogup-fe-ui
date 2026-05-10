@@ -1,0 +1,48 @@
+.search-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.search-bar {
+    flex: 7;
+    padding: 0.5rem 0.8rem;
+    border: 1px solid #d1d5db;
+    border-radius: 20px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.date-filter {
+    flex: 1;
+    padding: 0.4rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+}
+
+.date-range-filter {
+    flex: 1;
+    padding: 0.4rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+}
+
+/* Focus effect */
+.search-bar:focus {
+    border-color: #323239;
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px #a9a6a6;
+}
+
+/* date calendar cha icon */
+.date-filter,
+.date-range-filter {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    cursor: pointer;
+}
