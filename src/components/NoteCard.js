@@ -1,19 +1,17 @@
-
+import React from 'react';
+import { Card, CardContent, Typography } from '@mui/material';
 
 // left hand side notes card list 
-export default function NoteCard({note}){
+export default function NoteCard({note, onClick}){
+    
     return(
-        <div className='note-card'>
-            <div className='note-header'>
-                <span>{note?.mood}</span>
-                <span>{new Date(note.createdOn).toLocaleString()}</span>
-            </div>
-
-            <h2 className='note-title'>{note.noteTitle}</h2>
-
-            {/* {note.noteContent && (
-                <h3 className='note-content'>{note.noteContent}</h3>
-            )} */}
-        </div>
+        <Card onClick={onClick}>
+            <CardContent>
+                <Typography variant="h6">{note?.noteTitle}</Typography>
+                {/* <Typography>{note?.noteContent}</Typography> */}
+                <Typography> 🐸 {note?.mood}</Typography>
+                <Typography variant="body2" color="text.secondary">{new Date(note?.createdOn).toLocaleString()}</Typography>
+            </CardContent>
+        </Card>
     );
 }

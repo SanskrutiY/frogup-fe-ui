@@ -5,8 +5,9 @@ import NoteForm from './NoteForm';
 import NoteList from './NoteList';
 import NoteView from './NoteView';
 import SearchBar from './SearchBar';
-import { Fab, Box, Paper, Typography } from '@mui/material';
+import { Fab, Box, Paper, Typography, Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 
 export const MODES = {
     EMPTY: "empty",
@@ -18,9 +19,15 @@ export const MODES = {
 // main alignment page
 export default function Froggy(){
     const [mode, setMode] = useState(MODES.EMPTY);
+    const [selectedNote, setSelectedNote] = useState({});
 
     const handleCreate = () => {
         setMode(MODES.CREATE);
+    }
+    
+    const handleNoteClick = (note) => {
+        setSelectedNote(note);
+        setMode(MODES.VIEW)
     }
 
     return(
@@ -29,15 +36,30 @@ export default function Froggy(){
         <Paper sx={{ width: 320, p: 2 }}>
             <Header/>
             <SearchBar/>
-            <NoteList/>
+            <NoteList onNoteClick={handleNoteClick}/>
         </Paper>
 
         {/* Middle Panel */}
         <Paper sx={{ flex: 1, p: 2, position: "relative" }}>
             {mode === MODES.EMPTY && <MainShowPage/>}
-            {mode === MODES.VIEW && <NoteView isEdit={false}/>}
-            {mode === MODES.EDIT && <NoteView isEdit={true}/>}
+            {mode === MODES.VIEW && <NoteView isEdit={false} note={selectedNote}/>}
+            {mode === MODES.EDIT && <NoteView isEdit={true} note={selectedNote}/>}
             {mode === MODES.CREATE && <NoteForm/>}
+            
+            <Tooltip title="Close">
+            <Fab 
+            color="primary"
+            sx={{
+                position: "absolute",
+                bottom: 24,
+                right: 90,
+            }}
+            onClick={()=>{return setMode(MODES.EMPTY);}}>
+                <CloseIcon/>
+            </Fab>
+            </Tooltip>
+
+            <Tooltip title="Add Note">
             <Fab 
             color="primary"
             sx={{
@@ -48,6 +70,7 @@ export default function Froggy(){
             onClick={handleCreate}>
                 <AddIcon/>
             </Fab>
+            </Tooltip>
         </Paper>
 
         {/* Right Panel */}
