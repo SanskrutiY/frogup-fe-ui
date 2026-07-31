@@ -1,4 +1,4 @@
-import "./NoteCard.css";
+
 
 // left hand side notes card list 
 export default function NoteCard({note}){
