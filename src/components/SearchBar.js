@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import "./SearchBar.css"
 
 // the search bar on top left
 export default function SearchBar(){
