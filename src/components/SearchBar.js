@@ -9,8 +9,8 @@ import { DatePicker } from '@mui/x-date-pickers';
 
 // the search bar on top left
 export default function SearchBar(){
-    const [openSingleDate, setOpenSingleDate] = useState(false);
-    const [openFromDate, setOpenFromDate] = useState(false);
+    // const [openSingleDate, setOpenSingleDate] = useState(false);
+    // const [openFromDate, setOpenFromDate] = useState(false);
     const [openCalDialog, setOpenCalDialog] = useState(null);
     const [calendarType, setCalendarType] = useState(null); // "single" | "from"
 

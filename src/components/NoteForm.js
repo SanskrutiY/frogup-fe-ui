@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Divider, Grid, Paper, TextField, Tooltip, Fab } from '@mui/material';
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import { Divider, Grid, Paper, TextField, Tooltip } from '@mui/material';
 import { styled } from "@mui/material/styles";
 import { MOOD } from '../constants/Mood';
-import CheckIcon from '@mui/icons-material/Check';
+import * as repository from '../repository/index';
+import { useSnackbar } from 'notistack';
 
-// new or edit note page look (create/edit note)
-export default function NoteForm({note = null}) {
-    // note = null in JS -> is a default value
-    // if no note is passed then note = null
-    const PREFIX = "NoteForm";
-    const classes = {
-        title: `${PREFIX}-title`,
-        content: `${PREFIX}-content`,
-        moodGrid: `${PREFIX}-moodGrid`
-    };
-    const StyledPaper = styled(Paper)(() => ({
+const PREFIX = "NoteForm";
+const classes = {
+    title: `${PREFIX}-title`,
+    content: `${PREFIX}-content`,
+    moodGrid: `${PREFIX}-moodGrid`
+};
+const StyledPaper = styled(Paper)(() => ({
     [`& .${classes.title} .MuiFilledInput-root`]: {
         backgroundColor: "transparent",
     },
@@ -53,11 +50,21 @@ export default function NoteForm({note = null}) {
             backgroundColor: "#F5F5F5",
         },
     },
-    }));
+}));
+
+// new or edit note page look (create/edit note)
+const NoteForm = forwardRef(({ note = null }, ref) => {
+    // note = null in JS -> is a default value
+    // if no note is passed then note = null
 
     const [title, setTitle] = useState(note?.noteTitle ?? "");
     const [content, setContent] = useState(note?.noteContent ?? "");
-    const [selectedMood, setSelectedMood] = useState(note?.mood ?? null);
+    const [selectedMood, setSelectedMood] = useState(
+        MOOD.find((m) => m.displayName === note?.mood) ?? null
+    );
+    const [data, setData] = useState(null);
+    const [error, setError] =   useState("");
+    const { enqueueSnackbar } = useSnackbar();
 
     // changing data when the note has new values
     // had to add because when we didn't have this,
@@ -68,22 +75,71 @@ export default function NoteForm({note = null}) {
     useEffect(() => {
         setTitle(note?.noteTitle ?? "");
         setContent(note?.noteContent ?? "");
-        setSelectedMood(note?.mood ?? null);
+        // on opening the note -> it's mood should stay selected
+        setSelectedMood(
+            MOOD.find((m) => m.displayName === note?.mood) ?? null
+        );
     }, [note]);
 
     const handleSave = () => {
-        const data = {
-            noteTitle: title,
+        const reqData = {
+            noteTitle: title.trim() || "Untitled",
             noteContent: content,
-            mood: selectedMood
+            mood: selectedMood?.displayName
         };
 
         if(note){
             // update api
+            repository.updateNote(
+                note.noteId,
+                reqData,
+                (response) => {
+                    setData(response);
+                    enqueueSnackbar("Note updated successfully!", {
+                        variant: 'success'
+                    });
+                },
+                (error) => {
+                    setError(error);
+                    enqueueSnackbar("Something went wrong!", {
+                        variant: 'error'
+                    });
+                }
+            );
         } else {
             // create api
+            repository.createNote(
+                reqData,
+                (response) => {
+                    setData(response);
+                    enqueueSnackbar("Note created successfully!", {
+                        variant: 'success'
+                    });
+                },
+                (error) => {
+                    setError(error);
+                    enqueueSnackbar("Something went wrong!", {
+                        variant: 'error'
+                    });
+                }
+            );
         }
     };
+    useImperativeHandle(ref, () => ({
+        handleSave,
+    }));
+// using forwardRef and useImperativeHandle in Froggy and NoteForm
+// in order to let NoteForm own its note data
+// while Froggy controls only the Save Floating action button (Fab)
+// Normally, handleSave() exists inside NoteForm 
+// because it needs access to the form state. 
+// However, the Save button is displayed in Froggy. 
+// To allow the Save button to trigger the save logic without moving the form state to Froggy, 
+// we exposed the handleSave() method from NoteForm using useImperativeHandle, 
+// and accessed it from Froggy through a ref created with forwardRef.
+// This way, Froggy decides when to save, 
+// while NoteForm decides how to save, 
+// keeping responsibilities separate and avoiding unnecessary prop drilling.
 
     return(
         <StyledPaper sx={{
@@ -121,42 +177,40 @@ export default function NoteForm({note = null}) {
             <Grid container spacing={2}>
                 {/* Frog buttons here */}
                 {MOOD.map((mood) => (
-                    <Grid>
+                    <Grid size={2} key={mood.id}>
                         <Tooltip title={mood.displayName}>
                             <Paper 
                                 className={classes.moodGrid}
                                 sx={{
-                                    border: selectedMood === mood.id
+                                    border: selectedMood?.id === mood.id
                                         ? "2px solid #66BB6A"
                                         : undefined,
                                 }}
-                                onClick={() => setSelectedMood(mood.id)}
-                                elevation={selectedMood === mood.id ? 4 : 0}
+                                onClick={() => setSelectedMood(mood)}
+                                elevation={selectedMood?.id === mood.id ? 4 : 0}
                             >
                                 <img
                                     src={mood.image}
                                     alt={mood.displayName}
-                                    width={42}
-                                    height={42}
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover", // or "contain"
+                                        borderRadius: 8,
+                                        filter:
+                                            selectedMood?.id === mood.id
+                                                ? "none"
+                                                : "grayscale(100%) opacity(0.5)",
+                                        transition: "filter 0.2s ease",
+                                    }}
                                 />
                             </Paper>
                         </Tooltip>
                     </Grid>
                 ))}
             </Grid>
-
-            <Tooltip title="Save">
-            <Fab 
-            color="primary"
-            sx={{
-                position: "absolute",
-                bottom: 24,
-                right: 24,
-            }}
-            onClick={handleSave}>
-                <CheckIcon/>
-            </Fab>
-            </Tooltip>
         </StyledPaper>
     );
-}
+});
+
+export default NoteForm;

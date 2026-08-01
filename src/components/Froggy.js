@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Header from './Header';
 import MainShowPage from './MainShowPage';
 import NoteForm from './NoteForm';
 import NoteList from './NoteList';
 import NoteView from './NoteView';
 import SearchBar from './SearchBar';
-import { Fab, Box, Paper, Typography, Tooltip } from '@mui/material';
+import { Fab, Box, Paper, Typography, Tooltip, Divider } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
+import * as repository from '../repository/index';
 
 export const MODES = {
     EMPTY: "empty",
@@ -19,14 +21,93 @@ export const MODES = {
 export default function Froggy(){
     const [mode, setMode] = useState(MODES.EMPTY);
     const [selectedNote, setSelectedNote] = useState({});
+    const [data, setData] = useState(null);
+    const [error, setError] = useState("");
+
+// using forwardRef and useImperativeHandle in Froggy and NoteForm
+// in order to let NoteForm own its note data
+// while Froggy controls only the Save Floating action button (Fab)
+// Normally, handleSave() exists inside NoteForm 
+// because it needs access to the form state. 
+// However, the Save button is displayed in Froggy. 
+// To allow the Save button to trigger the save logic without moving the form state to Froggy, 
+// we exposed the handleSave() method from NoteForm using useImperativeHandle, 
+// and accessed it from Froggy through a ref created with forwardRef.
+// This way, Froggy decides when to save, 
+// while NoteForm decides how to save, 
+// keeping responsibilities separate and avoiding unnecessary prop drilling.
+    const noteFormRef = useRef();
+
+    const AddFab = () => {
+        return(
+            <Tooltip title="Add Note">
+                <Fab 
+                color="primary"
+                size="small"
+                sx={{
+                    position: "absolute",
+                    bottom: 24,
+                    right: 24,
+                }}
+                onClick={handleCreate}>
+                    <AddIcon/>
+                </Fab>
+            </Tooltip>
+        );
+    };
+
+    const SaveFab = ({ sx = {} }) => {
+        return(
+            <Tooltip title="Save">
+                <Fab 
+                color="primary"
+                size="small"
+                sx={{
+                    position: "absolute",
+                    bottom: 24,
+                    right: 24,
+                    ...sx,      // custom sx bcccc
+                }}
+                onClick={() => noteFormRef.current?.handleSave()}>
+                    <CheckIcon/>
+                </Fab>
+            </Tooltip>
+        );
+    };
+
+    const CloseFab = () => {
+        return(
+            <Tooltip title="Close">
+                <Fab 
+                color="primary"
+                size="small"
+                sx={{
+                    position: "absolute",
+                    top: 24,
+                    right: 24,
+
+                }}
+                onClick={()=>{return setMode(MODES.EMPTY);}}>
+                    <CloseIcon/>
+                </Fab>
+            </Tooltip>
+        );
+    };
 
     const handleCreate = () => {
         setMode(MODES.CREATE);
     }
     
     const handleNoteClick = (note) => {
-        setSelectedNote(note);
-        setMode(MODES.OPEN)
+        repository.getNoteById(
+            note.noteId,
+            (response) => {
+                setData(response);
+                setSelectedNote(note);
+                setMode(MODES.OPEN)
+            },
+            setError
+        );
     }
 
     return(
@@ -41,9 +122,17 @@ export default function Froggy(){
     }}
     >
         {/* Left Panel */}
-        <Paper sx={{ width: 320, p: 2 }}>
+        <Paper sx={{ 
+            width: 320, 
+            p: 2, 
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column"
+        }}>
             <Header/>
+            <Divider sx={{ borderStyle: 'none', p: 1 }} />
             <SearchBar/>
+            <Divider sx={{ borderStyle: 'none', p: 1 }} />
             <NoteList onNoteClick={handleNoteClick}/>
         </Paper>
 
@@ -59,34 +148,25 @@ export default function Froggy(){
             }}
         >
             {mode === MODES.EMPTY && <MainShowPage/>}
-            {mode === MODES.OPEN && <NoteView note={selectedNote}/>}
-            {mode === MODES.CREATE && <NoteForm/>}
-            
-            <Tooltip title="Close">
-            <Fab 
-            color="primary"
-            sx={{
-                position: "absolute",
-                bottom: 24,
-                right: 90,
-            }}
-            onClick={()=>{return setMode(MODES.EMPTY);}}>
-                <CloseIcon/>
-            </Fab>
-            </Tooltip>
+            {mode === MODES.OPEN && <NoteView note={selectedNote} ref={noteFormRef}/>}
+            {mode === MODES.CREATE && <NoteForm ref={noteFormRef}/>}
 
-            <Tooltip title="Add Note">
-            <Fab 
-            color="primary"
-            sx={{
-                position: "absolute",
-                bottom: 24,
-                right: 24,
-            }}
-            onClick={handleCreate}>
-                <AddIcon/>
-            </Fab>
-            </Tooltip>
+            <CloseFab/>
+
+            {mode === MODES.EMPTY &&
+                <AddFab/>
+            }
+            {mode === MODES.CREATE &&
+                <SaveFab/>
+            }
+            {mode === MODES.OPEN && (
+                <>
+                    <SaveFab sx={{ bottom: 80 }}/>
+                    <AddFab/>
+                </>
+            )
+            }
+
         </Paper>
 
         {/* Right Panel */}

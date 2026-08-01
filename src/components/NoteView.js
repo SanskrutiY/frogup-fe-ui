@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Box, TextField, Tooltip, Popover, Typography } from '@mui/material';
+import React, { forwardRef } from 'react';
 import NoteForm from './NoteForm';
 
 // how it looks when you view the note on click (detailed view)
-export default function NoteView({note}){
+const NoteView = forwardRef(({ note }, ref) => {
     return(
         <>
-        <NoteForm note={note}/>
-        {/* this page would have edit button */}
+        <NoteForm note={note} ref={ref}/>
         </>
     );
-}
+});
+
+export default NoteView;
