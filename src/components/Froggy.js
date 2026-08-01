@@ -11,8 +11,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 export const MODES = {
     EMPTY: "empty",
-    VIEW: "view",
-    EDIT: "edit",
+    OPEN: "open",
     CREATE: "create"
 }
 
@@ -27,11 +26,20 @@ export default function Froggy(){
     
     const handleNoteClick = (note) => {
         setSelectedNote(note);
-        setMode(MODES.VIEW)
+        setMode(MODES.OPEN)
     }
 
     return(
-    <Box sx={{ display: "flex", height: "100vh", gap: 2, p: 2 }}>
+    <Box 
+        sx={{
+        display: "flex",    
+        height: "100vh",
+        p: 2,
+        boxSizing: "border-box",
+        overflow: "hidden",
+        gap: 2,
+    }}
+    >
         {/* Left Panel */}
         <Paper sx={{ width: 320, p: 2 }}>
             <Header/>
@@ -40,10 +48,18 @@ export default function Froggy(){
         </Paper>
 
         {/* Middle Panel */}
-        <Paper sx={{ flex: 1, p: 2, position: "relative" }}>
+        <Paper 
+            sx={{
+                flex: 1,
+                p: 2,
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
+            }}
+        >
             {mode === MODES.EMPTY && <MainShowPage/>}
-            {mode === MODES.VIEW && <NoteView isEdit={false} note={selectedNote}/>}
-            {mode === MODES.EDIT && <NoteView isEdit={true} note={selectedNote}/>}
+            {mode === MODES.OPEN && <NoteView note={selectedNote}/>}
             {mode === MODES.CREATE && <NoteForm/>}
             
             <Tooltip title="Close">
