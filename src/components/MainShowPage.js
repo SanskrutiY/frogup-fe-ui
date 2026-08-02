@@ -13,6 +13,7 @@ export default function MainShowPage() {
                 alignItems: "center",
                 textAlign: "center",
                 gap: 3,
+                bgcolor: "white",
             }}
         >
             <Typography variant="h6" fontWeight={600}>

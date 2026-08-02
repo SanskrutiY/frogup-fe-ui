@@ -106,6 +106,7 @@ const NoteForm = forwardRef(({ note = null }, ref) => {
                     });
                 }
             );
+            window.location.reload();
         } else {
             // create api
             repository.createNote(
@@ -123,6 +124,7 @@ const NoteForm = forwardRef(({ note = null }, ref) => {
                     });
                 }
             );
+            window.location.reload();
         }
     };
     useImperativeHandle(ref, () => ({

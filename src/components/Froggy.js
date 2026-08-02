@@ -80,12 +80,12 @@ export default function Froggy(){
             <Tooltip title="Close">
                 <Fab 
                 color="primary"
+                disabled={mode === MODES.EMPTY}
                 size="small"
                 sx={{
                     position: "absolute",
                     top: 24,
                     right: 24,
-
                 }}
                 onClick={()=>{return setMode(MODES.EMPTY);}}>
                     <CloseIcon/>
