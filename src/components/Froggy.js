@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Header from './Header';
 import MainShowPage from './MainShowPage';
 import NoteForm from './NoteForm';
@@ -20,9 +20,10 @@ export const MODES = {
 // main alignment page
 export default function Froggy(){
     const [mode, setMode] = useState(MODES.EMPTY);
-    const [selectedNote, setSelectedNote] = useState({});
-    const [data, setData] = useState(null);
+    const [allNotes, setAllNotes] = useState([]);
     const [error, setError] = useState("");
+    const [filteredNotes, setFilteredNotes] = useState([]); // for search notes
+    const [selectedNote, setSelectedNote] = useState({});
 
 // using forwardRef and useImperativeHandle in Froggy and NoteForm
 // in order to let NoteForm own its note data
@@ -94,6 +95,14 @@ export default function Froggy(){
         );
     };
 
+    useEffect(() => {
+        repository.getAllNotes((notes) => {
+            setAllNotes(notes);     // for all notes data
+            // in case SearchBar passed any data we set those in here, or else by default populate it with all notes data
+            setFilteredNotes(notes);    // initially show all notes
+        }, setError);
+    }, []);
+
     const handleCreate = () => {
         setMode(MODES.CREATE);
     }
@@ -102,7 +111,6 @@ export default function Froggy(){
         repository.getNoteById(
             note.noteId,
             (response) => {
-                setData(response);
                 setSelectedNote(note);
                 setMode(MODES.OPEN)
             },
@@ -131,9 +139,10 @@ export default function Froggy(){
         }}>
             <Header/>
             <Divider sx={{ borderStyle: 'none', p: 1 }} />
-            <SearchBar/>
+            <SearchBar setFilteredNotes={setFilteredNotes} allNotes={allNotes}/>  {/* allNotes pathavle , setFilteredNotes bhetle */}
             <Divider sx={{ borderStyle: 'none', p: 1 }} />
-            <NoteList onNoteClick={handleNoteClick}/>
+            {/* filteredNotes by default has all notes / else searched notes  */}
+            <NoteList notes={filteredNotes} onNoteClick={handleNoteClick}/> 
         </Paper>
 
         {/* Middle Panel */}
@@ -174,9 +183,5 @@ export default function Froggy(){
             <Typography>Will upgrade later</Typography>
         </Paper>
     </Box>
-    
-    //     <div className="sidebar">
-    //     <div className="main-content">
-    //     <div className="extra-panel">
     );  
 };

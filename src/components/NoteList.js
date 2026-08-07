@@ -1,21 +1,9 @@
-import { useEffect, useState } from 'react';
-import * as repository from '../repository/index';
+import React from 'react';
 import NoteCard from './NoteCard';
 import { Stack, Typography, Box } from '@mui/material';
 
 // list of all the note cards on the left
-export default function NoteList({onNoteClick}) {
-
-    const [allNotes, setAllNotes] = useState([]);
-    const [error, setError] = useState("");
-
-    const getAllNotes = () => {
-        repository.getAllNotes(setAllNotes, setError);
-    };
-
-    useEffect(()=>{
-        getAllNotes();
-    }, []);
+export default function NoteList({notes, onNoteClick}) {
 
     return(
         <Box
@@ -26,8 +14,8 @@ export default function NoteList({onNoteClick}) {
             }}
         >
         <Stack spacing={2}>
-            {allNotes.length > 0
-            ? allNotes.map((note) => (
+            {notes.length > 0
+            ? notes.map((note) => (
                 <NoteCard 
                     key={note.noteId}
                     note={note} 
