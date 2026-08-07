@@ -24,6 +24,11 @@ const StyledPaper = styled(Paper)(() => ({
     [`& .${classes.title} .MuiFilledInput-root.Mui-focused::after`]: {
         borderBottom: "1px solid #d3d3d3",
     },
+    [`& .${classes.title} input`]: {
+        fontSize: "1.5rem",
+        fontWeight: 600,
+        color: "#5B4636",
+    },
 
 
     [`& .${classes.content} .MuiOutlinedInput-notchedOutline`]: {
@@ -149,7 +154,11 @@ const NoteForm = forwardRef(({ note = null }, ref) => {
             height: "100%",
             display: 'flex',
             flexDirection: 'column',
-            gap: 3
+            gap: 3,
+            bgcolor: "#FFFDF6",
+            borderRadius: 3,
+            border: "1px solid #E8DFC9",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
         }}>
             {/* Title */}
             <TextField 
